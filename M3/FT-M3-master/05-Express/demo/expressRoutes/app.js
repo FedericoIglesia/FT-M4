@@ -1,49 +1,52 @@
 var express = require("express");
-var app = express()
+var app = express();
 
-app.get("/", function(req, res){
-  res.send("Hello!")
-})
+app.get("/", function (req, res) {
+  res.send("Hello!");
+});
 
-app.get("/welcome/:name", function(req, res){
-  res.send(`Welcome ${capitalize(req.params.name)}`)
-})
+app.get("/welcome/:name", function (req, res) {
+  res.send(`Welcome ${capitalize(req.params.name)}`);
+});
 
-app.get("/hablar/:animal",function(req, res){
+app.get("/hablar/:animal", function (req, res) {
   var animals = {
-    perro:"wuf",
+    perro: "wuf",
     gato: "meow",
-    vaca: "muuu"
+    vaca: "muuu",
+  };
+  var animal = req.params.animal;
+  var ruido = animals[animal];
+  if (ruido) {
+    return res.send(`El ${animal} hizo ${ruido}`);
   }
-  var animal = req.params.animal
-  var ruido = animals[animal]
-  if(ruido) {
-    return res.send(`El ${animal} hizo ${ruido}`)
+  res.redirect("/error");
+});
+
+app.get("/repeat/:word/:times", function (req, res) {
+  var string = "";
+  if (parseInt(req.params.times)) {
+    for (var i = 0; i < req.params.times; i++) {
+      string += "<p>" + req.params.word + "</p>";
+    }
+  } else {
+    string = "Tenes q poner un numero de veces como ultimo parametro";
   }
-  res.redirect("/error")
-})
+  res.send(string);
+});
 
-app.get("/repeat/:word/:times", function(req, res){
-  var string = ""
-  if(parseInt(req.params.times)){
-  for(var i=0; i < req.params.times; i++) {
-    string += "<p>" + req.params.word + "</p>"
-  }} else {
-    string = "Tenes q poner un numero de veces como ultimo parametro"
-  }
-  res.send(string)
-})
+app.get("/error", function (req, res) {
+  // El .send envia por default un status 200. Para cambiarlo hay que hacerlo por medio del metodo status, al cual se le puede concatenar el send. Checkear express documentation
+  res.status(400).send("Cannot be Found!");
+  // res.send("Cannot be Found!")
+});
 
-app.get("/error", function(req, res){
-  res.send("Cannot be Found!")
-})
+app.get("*", function (req, res) {
+  res.redirect("/error");
+});
 
-app.get("*", function(req, res){
-  res.redirect("/error")
-})
+app.listen(8000);
 
-app.listen(8000)
-
-function capitalize(string){
-  return string.slice(0,1).toUpperCase()+string.slice(1)
+function capitalize(string) {
+  return string.slice(0, 1).toUpperCase() + string.slice(1);
 }
